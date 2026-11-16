@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Заявка №{{ ticket.source_id }}</h1>
+<dl class="card" style="line-height: 1.6;">
+  <dt>Дата</dt><dd>{{ ticket.date }}</dd>
+  <dt>Кабинет</dt><dd>{{ ticket.room }}</dd>
+  <dt>Категория</dt><dd>{{ ticket.category.name }}</dd>
+  <dt>Тема</dt><dd>{{ ticket.subject }}</dd>
+  <dt>Статус</dt><dd>{{ ticket.status }}</dd>
+  <dt>Исполнитель</dt><dd>{{ ticket.executor.username if ticket.executor else '—' }}</dd>
+  <dt>Сервис недоступен</dt><dd>{{ 'Да' if ticket.service_down else 'Нет' }}</dd>
+  <dt>Затронуто</dt><dd>{{ ticket.affected_count }}</dd>
+  <dt>Приоритет</dt>
+  <dd class="prio {{ ticket.priority }}">{{ ticket.priority }} — {{ ticket.priority_reason }}</dd>
+</dl>
+
+{% if current_user.role in ('operator', 'admin') %}
+<form method="post" action="{{ url_for('tickets.assign', tid=ticket.id) }}" class="card">
+  <label>Назначить исполнителя:
+    <select name="executor_id">
+      {% for e in executors %}
+        <option value="{{ e.id }}"
+          {% if ticket.executor_id == e.id %}selected{% endif %}>{{ e.username }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button type="submit">Назначить</button>
+</form>
+{% endif %}
+
+{% if current_user.role in ('executor', 'admin') %}
+<form method="post" action="{{ url_for('tickets.change_status', tid=ticket.id) }}" class="card">
+  <label>Сменить статус:
+    <select name="status">
+      <option value="В работе">В работе</option>
+      <option value="Закрыта">Закрыта</option>
+    </select>
+  </label>
+  <button type="submit">Применить</button>
+</form>
+{% endif %}
+
+<h2>История статусов</h2>
+<ul>
+{% for h in history %}
+  <li>{{ h.changed_at }} — {{ h.old_status or '—' }} → {{ h.new_status }}
+      ({{ h.user.username if h.user else '—' }})</li>
+{% else %}
+  <li>Нет записей</li>
+{% endfor %}
+</ul>
+{% endblock %}

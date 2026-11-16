@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Новая заявка</h1>
+<form method="post" class="card">
+  <p>Тема: <input name="subject" value="{{ data.subject or '' }}"> {% if errors.subject %}<span style="color:red">{{ errors.subject }}</span>{% endif %}</p>
+  <p>Кабинет: <input name="room" value="{{ data.room or '' }}"> {% if errors.room %}<span style="color:red">{{ errors.room }}</span>{% endif %}</p>
+  <p>Категория: 
+    <select name="category_id">
+      <option value="">— выберите —</option>
+      {% for c in categories %}
+        <option value="{{ c.id }}">{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </p>
+  <button type="submit">Создать</button>
+</form>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Заявки</h1>
+<form method="get" style="margin-bottom: 10px;">
+  <input name="room" placeholder="Кабинет" value="{{ room }}">
+  <button type="submit">Фильтр</button>
+</form>
+<table>
+  <thead>
+    <tr><th>№</th><th>Дата</th><th>Кабинет</th><th>Тема</th><th>Статус</th><th>Исполнитель</th><th>Приоритет</th></tr>
+  </thead>
+  <tbody>
+  {% for t in tickets %}
+    <tr>
+      <td><a href="{{ url_for('tickets.ticket_card', tid=t.id) }}">{{ t.source_id }}</a></td>
+      <td>{{ t.date }}</td>
+      <td>{{ t.room }}</td>
+      <td>{{ t.subject }}</td>
+      <td>{{ t.status }}</td>
+      <td>{{ t.executor.username if t.executor else '—' }}</td>
+      <td class="prio {{ t.priority }}">{{ t.priority }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7">Нет заявок</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
